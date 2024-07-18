@@ -1,11 +1,17 @@
+import { Route, Routes } from 'react-router-dom';
 import './App.css';
-import SearchSection from './components/SearchSection/SearchSection';
+import { AppProvider } from './context/AppContext';
+import MainPage from './pages/MainPage';
+import NotFoundPage from './pages/NotFoundPage/NotFoundPage';
 
 function App() {
   return (
-    <>
-      <SearchSection />
-    </>
+    <AppProvider>
+      <Routes>
+        <Route path="/" element={<MainPage />} />
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </AppProvider>
   );
 }
 

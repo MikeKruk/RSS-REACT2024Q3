@@ -1,5 +1,17 @@
+import IPokemonDetails from './Pokemon/PokemonDetails';
+
 interface IState {
   hasError: boolean;
 }
 
-export default IState;
+interface StateType {
+  searchValue: string;
+  pokemonList: IPokemonDetails[];
+}
+
+interface ActionType {
+  type: string;
+  payload?: string | number | IPokemonDetails[];
+}
+
+export type { StateType, ActionType, IState };

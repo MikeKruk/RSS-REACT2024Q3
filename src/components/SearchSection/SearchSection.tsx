@@ -1,25 +1,26 @@
-import { useState } from 'react';
-import './SearchSection.css';
+import { useEffect, useState } from 'react';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 import ButtonError from '../ButtonError';
 import ErrorMessage from '../ErrorMessage/ErrorMessage';
+import { setInitialSearchValue, setSearchValue } from '../../context/action/action';
+import './SearchSection.css';
 import { HAS_CYRILLIC, HAS_SPACES } from '../../constants/validationConstants';
+import { useAppContext } from '../../hooks/useAppContext';
+import { useAppDispatch } from '../../hooks/useAppDispatch';
 
 const SearchSection: React.FC = () => {
-  const [searchValue, setSearchValue] = useState('');
+  const searchValue = useAppContext(state => state.searchValue);
+  const dispatch = useAppDispatch();
+
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  // const [pokemons, setPokemons] = useState([]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchValue(event.target.value);
+    dispatch(setSearchValue(event.target.value));
+    localStorage.setItem('searchValue', event.target.value);
   };
 
   const handleSearch = () => {
-    localStorage.setItem('searchValue', searchValue);
-
-    setIsLoading(true);
-
     if (HAS_SPACES.test(searchValue)) {
       setErrorMessage('Search field cannot contain spaces');
       setIsLoading(false);
@@ -32,6 +33,10 @@ const SearchSection: React.FC = () => {
   const onClick = () => {
     console.log('Error simulation');
   };
+
+  useEffect(() => {
+    dispatch(setInitialSearchValue(localStorage.getItem('searchValue') || ''));
+  }, []);
 
   return (
     <>
