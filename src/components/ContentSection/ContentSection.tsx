@@ -7,38 +7,39 @@ import { useAppDispatch } from '../../hooks/useAppDispatch';
 import { useAppContext } from '../../hooks/useAppContext';
 import { getPokemonsList } from '../../context/action/action';
 import './ContentSection.css';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const ContentSection: React.FC = () => {
   const dispatch = useAppDispatch();
   const pokemonList = useAppContext(state => state.pokemonList);
-  const navigate = useNavigate();
-  const params = useParams();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [offset, setOffset] = useState(0);
   const [selectedCard, setSelectedCard] = useState<IPokemonDetails | null>(null);
   const [isCardSelected, setIsCardSelected] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  const page = Number(searchParams.get('page')) || 1;
+  const id = Number(searchParams.get('details'));
+  const offset = (page - 1) * 20;
 
   const handleNextCard = () => {
     setIsLoading(true);
-    const nextPage = offset / 20 + 1;
-    navigate(`/?page=${nextPage}`);
 
     setTimeout(() => {
-      setOffset(offset + 20);
+      setSearchParams({ page: (page + 1).toString() });
       setIsLoading(false);
     }, 500);
   };
 
   const handlePreviousCard = () => {
+    console.log(page === Number(searchParams.get('page')), typeof page, isNaN(page));
+
     setIsLoading(true);
-    const prevPage = offset / 20 - 1;
-    navigate(`/?page=${prevPage}`);
 
     if (offset > 0) {
       setTimeout(() => {
-        setOffset(offset - 20);
+        setSearchParams({ page: (page - 1).toString() });
         setIsLoading(false);
       }, 500);
     }
@@ -46,23 +47,47 @@ const ContentSection: React.FC = () => {
 
   useEffect(() => {
     getPokemonsList(offset, dispatch);
-  }, [offset]);
+  }, [offset, page]);
+
+  useEffect(() => {
+    if (Number(page) < 1) {
+      navigate('/404');
+    }
+  }, [navigate]);
+
+  useEffect(() => {
+    if (id) {
+      const pokemon = pokemonList.find(pokemon => pokemon.id === Number(id));
+      if (pokemon) {
+        setSelectedCard(pokemon);
+        setIsCardSelected(true);
+      }
+    } else {
+      setSelectedCard(null);
+      setIsCardSelected(false);
+    }
+  }, [id, pokemonList]);
 
   const handleCardClick = (pokemon: IPokemonDetails) => {
+    if (pokemon.id) {
+      setSearchParams({ page: page.toString(), details: pokemon.id.toString() });
+    }
     setIsCardSelected(true);
     setSelectedCard(pokemon);
-    navigate(`/?page=${params.page}&details=${pokemon.id}`);
   };
 
   const handleClose = () => {
+    setSearchParams({ page: page.toString() });
     setIsCardSelected(false);
     setSelectedCard(null);
   };
 
   const handelContentSectionClick = () => {
     if (selectedCard) {
+      setSearchParams({ page: page.toString() });
       setIsCardSelected(false);
       setSelectedCard(null);
+      console.log(id);
     }
   };
 
@@ -81,10 +106,10 @@ const ContentSection: React.FC = () => {
       <div className={`content-section ${isCardSelected ? 'selected-mode' : ''}`}>
         {isLoading && <LoadingSpinner />}
         <div className="cards-container" onClick={handelContentSectionClick}>
-          {pokemonList.map((pokemonItem, index) => (
+          {pokemonList.map(pokemonItem => (
             <Card
               {...pokemonItem}
-              key={index}
+              key={pokemonItem.id}
               onClick={() => {
                 handleCardClick(pokemonItem);
               }}

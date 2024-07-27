@@ -3,8 +3,10 @@ import './Card.css';
 
 const Card: React.FC<ICardProps> = ({ name, sprites, stats, onClick }: ICardProps) => {
   const handleClick = () => (onClick ? onClick() : null);
+
   return (
     <div className="pokemon-card" onClick={handleClick}>
+      <div className="checkbox-container"></div>
       <h3>{name.toLocaleUpperCase()}</h3>
       <img src={sprites.front_default} alt="Pokemon" className="pokemon-card_img" />
       <div className="pokemon-stats">

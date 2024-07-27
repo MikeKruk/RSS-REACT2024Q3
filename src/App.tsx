@@ -1,16 +1,12 @@
-import { Route, Routes } from 'react-router-dom';
+import { Route, RouterProvider, Routes } from 'react-router-dom';
 import './App.css';
 import { AppProvider } from './context/AppContext';
-import MainPage from './pages/MainPage';
-import NotFoundPage from './pages/NotFoundPage/NotFoundPage';
+import router from './router/router';
 
 function App() {
   return (
     <AppProvider>
-      <Routes>
-        <Route path="/" element={<MainPage />} />
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
+      <RouterProvider router={router} />
     </AppProvider>
   );
 }
