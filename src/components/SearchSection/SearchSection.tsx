@@ -3,7 +3,7 @@ import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 import ButtonError from '../ButtonError';
 import ErrorMessage from '../ErrorMessage/ErrorMessage';
 import { setInitialSearchValue, setSearchValue } from '../../context/action/action';
-import './SearchSection.css';
+import './searchSection.css';
 import { HAS_CYRILLIC, HAS_SPACES } from '../../constants/validationConstants';
 import { useAppContext } from '../../hooks/useAppContext';
 import { useAppDispatch } from '../../hooks/useAppDispatch';

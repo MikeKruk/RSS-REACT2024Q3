@@ -1,4 +1,4 @@
-import IPokemonDetails from './Pokemon/PokemonDetails';
+import IPokemonDetails from './Pokemon/pokemonDetails';
 
 interface IState {
   hasError: boolean;

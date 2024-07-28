@@ -4,7 +4,7 @@ import {
   SET_INITIAL_SEARCH_VALUE,
   SET_SEARCH_VALUE,
 } from '../../constants/actionConstants';
-import { ActionType } from '../../types/State';
+import { ActionType } from '../../types/state';
 
 export const setSearchValue = (value: string) => ({
   type: SET_SEARCH_VALUE,

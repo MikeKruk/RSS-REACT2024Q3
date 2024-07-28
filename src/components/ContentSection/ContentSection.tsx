@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 import Card from '../Card/Card';
-import IPokemonDetails from '../../types/Pokemon/PokemonDetails';
+import IPokemonDetails from '../../types/Pokemon/pokemonDetails';
 import SelectedCard from '../SelectedCard/SelectedCard';
 import { useAppDispatch } from '../../hooks/useAppDispatch';
 import { useAppContext } from '../../hooks/useAppContext';
 import { getPokemonsList } from '../../context/action/action';
-import './ContentSection.css';
+import './contentSection.css';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import SelectionFlyout from '../SelectionFlyout/SelectionFlyout';
 
 const ContentSection: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -18,6 +19,10 @@ const ContentSection: React.FC = () => {
   const [isCardSelected, setIsCardSelected] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+  const [selectedItems, setSelectedItems] = useState(() => {
+    const storedSelectedItems = localStorage.getItem('selectedItems');
+    return storedSelectedItems ? new Set(JSON.parse(storedSelectedItems)) : new Set();
+  });
 
   const page = Number(searchParams.get('page')) || 1;
   const id = Number(searchParams.get('details'));
@@ -33,8 +38,6 @@ const ContentSection: React.FC = () => {
   };
 
   const handlePreviousCard = () => {
-    console.log(page === Number(searchParams.get('page')), typeof page, isNaN(page));
-
     setIsLoading(true);
 
     if (offset > 0) {
@@ -44,6 +47,10 @@ const ContentSection: React.FC = () => {
       }, 500);
     }
   };
+
+  useEffect(() => {
+    localStorage.setItem('selectedItems', JSON.stringify([...selectedItems]));
+  }, [selectedItems]);
 
   useEffect(() => {
     getPokemonsList(offset, dispatch);
@@ -87,8 +94,42 @@ const ContentSection: React.FC = () => {
       setSearchParams({ page: page.toString() });
       setIsCardSelected(false);
       setSelectedCard(null);
-      console.log(id);
     }
+  };
+
+  const handleCheckboxChange = (id: number, isSelected: boolean) => {
+    setSelectedItems(prevSelectedItems => {
+      const updateSelectedItems = new Set(prevSelectedItems);
+      if (isSelected) {
+        updateSelectedItems.add(id);
+      } else {
+        updateSelectedItems.delete(id);
+      }
+      return updateSelectedItems;
+    });
+  };
+
+  const handelUnselectAll = () => {
+    setSelectedItems(new Set());
+  };
+
+  const handelOnDownload = () => {
+    const selectedPokemons = pokemonList.filter(pokemon => selectedItems.has(pokemon.id));
+    const data = selectedPokemons.map(pokemon => ({
+      id: pokemon.id ? `${pokemon.id}` : '',
+      name: pokemon.name,
+      image: pokemon.sprites.front_default,
+      hp: pokemon.stats.find(stat => stat.stat.name === 'hp')?.base_stat,
+      attack: pokemon.stats.find(stat => stat.stat.name === 'attack')?.base_stat,
+      defense: pokemon.stats.find(stat => stat.stat.name === 'defense')?.base_stat,
+      specialAttack: pokemon.stats.find(stat => stat.stat.name === 'special-attack')
+        ?.base_stat,
+      specialDefense: pokemon.stats.find(stat => stat.stat.name === 'special-defense')
+        ?.base_stat,
+      speed: pokemon.stats.find(stat => stat.stat.name === 'speed')?.base_stat,
+      detailsUrl: `${window.location.origin}/?page=${page}&details=${pokemon.id}`,
+    }));
+    return data;
   };
 
   return (
@@ -113,6 +154,11 @@ const ContentSection: React.FC = () => {
               onClick={() => {
                 handleCardClick(pokemonItem);
               }}
+              selected={selectedItems.has(pokemonItem.id)}
+              onSelect={isSelected =>
+                pokemonItem.id !== undefined &&
+                handleCheckboxChange(pokemonItem.id, isSelected)
+              }
             />
           ))}
         </div>
@@ -125,6 +171,13 @@ const ContentSection: React.FC = () => {
           </>
         )}
       </div>
+      {selectedItems.size > 0 && (
+        <SelectionFlyout
+          onUnselectAll={handelUnselectAll}
+          generateDownloadData={handelOnDownload}
+          selectedItems={selectedItems.size}
+        />
+      )}
     </>
   );
 };

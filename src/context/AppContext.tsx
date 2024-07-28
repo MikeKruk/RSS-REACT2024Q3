@@ -1,11 +1,11 @@
 import React, { createContext, useReducer, ReactNode } from 'react';
-import { ActionType, StateType } from '../types/State';
+import { ActionType, StateType } from '../types/state';
 import {
   GET_POKEMONS_LIST,
   SET_INITIAL_SEARCH_VALUE,
   SET_SEARCH_VALUE,
 } from '../constants/actionConstants';
-import IPokemonDetails from '../types/Pokemon/PokemonDetails';
+import IPokemonDetails from '../types/Pokemon/pokemonDetails';
 
 const initialState: StateType = { searchValue: '', pokemonList: [] };
 

@@ -1,6 +1,6 @@
 import apiConstants from '../constants/apiConstants';
-import IPokemonDetails from '../types/Pokemon/PokemonDetails';
-import { IPokemons } from '../types/Pokemon/Pokemons';
+import IPokemonDetails from '../types/Pokemon/pokemonDetails';
+import { IPokemons } from '../types/Pokemon/pokemons';
 
 export async function fetchPokemonsList(offset: number) {
   const response = await fetch(`${apiConstants.API_URL}pokemon/?offset=${offset}`);

@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { StateType } from '../types/State';
+import { StateType } from '../types/state';
 import { AppContext } from '../context/AppContext';
 
 type Selector<T> = (state: StateType) => T;
