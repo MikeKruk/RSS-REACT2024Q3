@@ -1,34 +1,60 @@
 import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 import Card from '../Card/Card';
 import IPokemonDetails from '../../types/Pokemon/pokemonDetails';
 import SelectedCard from '../SelectedCard/SelectedCard';
-import { useAppDispatch } from '../../hooks/useAppDispatch';
-import { useAppContext } from '../../hooks/useAppContext';
-import { getPokemonsList } from '../../context/action/action';
 import './contentSection.css';
-import { useNavigate, useSearchParams } from 'react-router-dom';
 import SelectionFlyout from '../SelectionFlyout/SelectionFlyout';
+import { IPokemonResult } from '../../types/Pokemon/pokemons';
+import {
+  useLazyPokemonDetailsQuery,
+  useLazyPokemonSearchQuery,
+  usePokemonsQuery,
+} from '../../store/pokeapi/poke.api';
+import useAppSelector from '../../hooks/redux';
+import useActions from '../../hooks/actions';
 
 const ContentSection: React.FC = () => {
-  const dispatch = useAppDispatch();
-  const pokemonList = useAppContext(state => state.pokemonList);
-
+  const { searchValue } = useAppSelector(state => state.search);
+  const { selectedItems } = useAppSelector(state => state.poke);
+  const { clearSelectedValue, addSelectedValue, deleteSelectedValue } = useActions();
   const [isLoading, setIsLoading] = useState(false);
   const [selectedCard, setSelectedCard] = useState<IPokemonDetails | null>(null);
   const [isCardSelected, setIsCardSelected] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [selectedItems, setSelectedItems] = useState(() => {
-    const storedSelectedItems = localStorage.getItem('selectedItems');
-    return storedSelectedItems ? new Set(JSON.parse(storedSelectedItems)) : new Set();
-  });
+  const [pokemonList, setPokemonList] = useState<IPokemonDetails[] | null>(null);
 
   const page = Number(searchParams.get('page')) || 1;
   const id = Number(searchParams.get('details'));
   const offset = (page - 1) * 20;
 
+  const { isLoading: isLoadingPokemons, data: pokemons } = usePokemonsQuery(offset);
+  const [fetchPokemonDetails] = useLazyPokemonDetailsQuery();
+  const [fetchPokemonDetailsBySearch] = useLazyPokemonSearchQuery();
+
+  useEffect(() => {
+    const fetchDetails = async () => {
+      if (pokemons) {
+        const pokemonDetailsPromises: Promise<IPokemonDetails>[] = pokemons.map(
+          ({ url }: IPokemonResult) => fetchPokemonDetails(url).unwrap(),
+        );
+
+        try {
+          const pokemonDetails = await Promise.all(pokemonDetailsPromises);
+          setPokemonList(pokemonDetails);
+        } catch (error) {
+          console.error('Error fetching pokemon details:', error);
+        }
+      }
+    };
+
+    fetchDetails();
+  }, [fetchPokemonDetails, pokemons]);
+
   const handleNextCard = () => {
+    setPokemonList(null);
     setIsLoading(true);
 
     setTimeout(() => {
@@ -38,6 +64,7 @@ const ContentSection: React.FC = () => {
   };
 
   const handlePreviousCard = () => {
+    setPokemonList(null);
     setIsLoading(true);
 
     if (offset > 0) {
@@ -49,14 +76,6 @@ const ContentSection: React.FC = () => {
   };
 
   useEffect(() => {
-    localStorage.setItem('selectedItems', JSON.stringify([...selectedItems]));
-  }, [selectedItems]);
-
-  useEffect(() => {
-    getPokemonsList(offset, dispatch);
-  }, [offset, page]);
-
-  useEffect(() => {
     if (Number(page) < 1) {
       navigate('/404');
     }
@@ -64,7 +83,7 @@ const ContentSection: React.FC = () => {
 
   useEffect(() => {
     if (id) {
-      const pokemon = pokemonList.find(pokemon => pokemon.id === Number(id));
+      const pokemon = pokemonList?.find(pokemon => pokemon.id === Number(id));
       if (pokemon) {
         setSelectedCard(pokemon);
         setIsCardSelected(true);
@@ -97,39 +116,41 @@ const ContentSection: React.FC = () => {
     }
   };
 
-  const handleCheckboxChange = (id: number, isSelected: boolean) => {
-    setSelectedItems(prevSelectedItems => {
-      const updateSelectedItems = new Set(prevSelectedItems);
-      if (isSelected) {
-        updateSelectedItems.add(id);
-      } else {
-        updateSelectedItems.delete(id);
-      }
-      return updateSelectedItems;
-    });
-  };
+  const handleCheckboxChange = (id: number, isSelected: boolean) =>
+    isSelected ? addSelectedValue(id) : deleteSelectedValue(id);
 
   const handelUnselectAll = () => {
-    setSelectedItems(new Set());
+    clearSelectedValue();
   };
 
-  const handelOnDownload = () => {
-    const selectedPokemons = pokemonList.filter(pokemon => selectedItems.has(pokemon.id));
-    const data = selectedPokemons.map(pokemon => ({
-      id: pokemon.id ? `${pokemon.id}` : '',
-      name: pokemon.name,
-      image: pokemon.sprites.front_default,
-      hp: pokemon.stats.find(stat => stat.stat.name === 'hp')?.base_stat,
-      attack: pokemon.stats.find(stat => stat.stat.name === 'attack')?.base_stat,
-      defense: pokemon.stats.find(stat => stat.stat.name === 'defense')?.base_stat,
-      specialAttack: pokemon.stats.find(stat => stat.stat.name === 'special-attack')
-        ?.base_stat,
-      specialDefense: pokemon.stats.find(stat => stat.stat.name === 'special-defense')
-        ?.base_stat,
-      speed: pokemon.stats.find(stat => stat.stat.name === 'speed')?.base_stat,
-      detailsUrl: `${window.location.origin}/?page=${page}&details=${pokemon.id}`,
-    }));
-    return data;
+  const handelOnDownload = async () => {
+    const selectedPokemons: Promise<IPokemonDetails>[] = [];
+
+    selectedItems.forEach(id =>
+      selectedPokemons.push(fetchPokemonDetailsBySearch(id).unwrap()),
+    );
+
+    try {
+      const selectedPokemonsDetails: IPokemonDetails[] =
+        await Promise.all(selectedPokemons);
+      const data = selectedPokemonsDetails?.map(pokemon => ({
+        id: pokemon.id ? `${pokemon.id}` : '',
+        name: pokemon.name,
+        image: pokemon.sprites.front_default,
+        hp: pokemon.stats.find(stat => stat.stat.name === 'hp')?.base_stat,
+        attack: pokemon.stats.find(stat => stat.stat.name === 'attack')?.base_stat,
+        defense: pokemon.stats.find(stat => stat.stat.name === 'defense')?.base_stat,
+        specialAttack: pokemon.stats.find(stat => stat.stat.name === 'special-attack')
+          ?.base_stat,
+        specialDefense: pokemon.stats.find(stat => stat.stat.name === 'special-defense')
+          ?.base_stat,
+        speed: pokemon.stats.find(stat => stat.stat.name === 'speed')?.base_stat,
+        detailsUrl: `${window.location.origin}/?page=${page}&details=${pokemon.id}`,
+      }));
+      return data;
+    } catch (error) {
+      console.error('Error fetching pokemon details:', error);
+    }
   };
 
   return (
@@ -145,22 +166,24 @@ const ContentSection: React.FC = () => {
         )}
       </div>
       <div className={`content-section ${isCardSelected ? 'selected-mode' : ''}`}>
-        {isLoading && <LoadingSpinner />}
+        {(isLoading || isLoadingPokemons || !pokemonList) && <LoadingSpinner />}
         <div className="cards-container" onClick={handelContentSectionClick}>
-          {pokemonList.map(pokemonItem => (
-            <Card
-              {...pokemonItem}
-              key={pokemonItem.id}
-              onClick={() => {
-                handleCardClick(pokemonItem);
-              }}
-              selected={selectedItems.has(pokemonItem.id)}
-              onSelect={isSelected =>
-                pokemonItem.id !== undefined &&
-                handleCheckboxChange(pokemonItem.id, isSelected)
-              }
-            />
-          ))}
+          {pokemonList
+            ?.filter(({ name }) => name.includes(searchValue.toLowerCase()))
+            .map(pokemonItem => (
+              <Card
+                {...pokemonItem}
+                key={pokemonItem.id}
+                onClick={() => {
+                  handleCardClick(pokemonItem);
+                }}
+                selected={!!pokemonItem.id && selectedItems.includes(pokemonItem.id)}
+                onSelect={isSelected =>
+                  pokemonItem.id !== undefined &&
+                  handleCheckboxChange(pokemonItem.id, isSelected)
+                }
+              />
+            ))}
         </div>
         {isCardSelected && selectedCard && (
           <>
@@ -171,11 +194,11 @@ const ContentSection: React.FC = () => {
           </>
         )}
       </div>
-      {selectedItems.size > 0 && (
+      {selectedItems.length > 0 && (
         <SelectionFlyout
           onUnselectAll={handelUnselectAll}
           generateDownloadData={handelOnDownload}
-          selectedItems={selectedItems.size}
+          selectedItems={selectedItems.length}
         />
       )}
     </>
