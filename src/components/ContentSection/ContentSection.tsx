@@ -1,20 +1,20 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
-import Card from '../Card/Card';
 import IPokemonDetails from '../../types/Pokemon/pokemonDetails';
-import SelectedCard from '../SelectedCard/SelectedCard';
-import './contentSection.css';
 import SelectionFlyout from '../SelectionFlyout/SelectionFlyout';
 import { IPokemonResult } from '../../types/Pokemon/pokemons';
+import useAppSelector from '../../hooks/redux';
+import useActions from '../../hooks/actions';
+import { Datas } from 'react-csv-downloader/dist/esm/lib/csv';
 import {
   useLazyPokemonDetailsQuery,
   useLazyPokemonSearchQuery,
   usePokemonsQuery,
 } from '../../store/pokeapi/poke.api';
-import useAppSelector from '../../hooks/redux';
-import useActions from '../../hooks/actions';
-import { Datas } from 'react-csv-downloader/dist/esm/lib/csv';
+import Card from '../Card/Card';
+import './contentSection.css';
+import SelectedCard from '../SelectedCard/SelectedCard';
 
 const ContentSection: React.FC = () => {
   const { searchValue } = useAppSelector(state => state.search);
