@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { IPokemonResult, IPokemons } from '../../types/Pokemon/pokemons';
 import IPokemonDetails from '../../types/Pokemon/pokemonDetails';
+import apiConstants from '../../constants/apiConstants';
 
 export const pokeApi = createApi({
   reducerPath: 'pokeapi',
@@ -10,14 +11,14 @@ export const pokeApi = createApi({
   endpoints: build => ({
     pokemons: build.query<IPokemonResult[], number>({
       query: (offset: number) => ({
-        url: 'https://pokeapi.co/api/v2/pokemon',
+        url: `${apiConstants.API_URL}pokemon`,
         params: { offset },
       }),
       transformResponse: (response: IPokemons) => response.results,
     }),
     pokemonSearch: build.query<IPokemonDetails, number>({
       query: (id: number) => ({
-        url: `https://pokeapi.co/api/v2/pokemon/${id}/`,
+        url: `${apiConstants.API_URL}pokemon/${id}/`,
       }),
     }),
     pokemonDetails: build.query<IPokemonDetails, string>({
