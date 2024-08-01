@@ -14,6 +14,7 @@ import {
 } from '../../store/pokeapi/poke.api';
 import useAppSelector from '../../hooks/redux';
 import useActions from '../../hooks/actions';
+import { Datas } from 'react-csv-downloader/dist/esm/lib/csv';
 
 const ContentSection: React.FC = () => {
   const { searchValue } = useAppSelector(state => state.search);
@@ -123,7 +124,7 @@ const ContentSection: React.FC = () => {
     clearSelectedValue();
   };
 
-  const handelOnDownload = async () => {
+  const handelOnDownload = async (): Promise<Datas> => {
     const selectedPokemons: Promise<IPokemonDetails>[] = [];
 
     selectedItems.forEach(id =>
@@ -137,19 +138,28 @@ const ContentSection: React.FC = () => {
         id: pokemon.id ? `${pokemon.id}` : '',
         name: pokemon.name,
         image: pokemon.sprites.front_default,
-        hp: pokemon.stats.find(stat => stat.stat.name === 'hp')?.base_stat,
-        attack: pokemon.stats.find(stat => stat.stat.name === 'attack')?.base_stat,
-        defense: pokemon.stats.find(stat => stat.stat.name === 'defense')?.base_stat,
-        specialAttack: pokemon.stats.find(stat => stat.stat.name === 'special-attack')
-          ?.base_stat,
-        specialDefense: pokemon.stats.find(stat => stat.stat.name === 'special-defense')
-          ?.base_stat,
-        speed: pokemon.stats.find(stat => stat.stat.name === 'speed')?.base_stat,
+        hp: pokemon.stats.find(stat => stat.stat.name === 'hp')?.base_stat.toString(),
+        attack: pokemon.stats
+          .find(stat => stat.stat.name === 'attack')
+          ?.base_stat.toString(),
+        defense: pokemon.stats
+          .find(stat => stat.stat.name === 'defense')
+          ?.base_stat.toString(),
+        specialAttack: pokemon.stats
+          .find(stat => stat.stat.name === 'special-attack')
+          ?.base_stat.toString(),
+        specialDefense: pokemon.stats
+          .find(stat => stat.stat.name === 'special-defense')
+          ?.base_stat.toString(),
+        speed: pokemon.stats
+          .find(stat => stat.stat.name === 'speed')
+          ?.base_stat.toString(),
         detailsUrl: `${window.location.origin}/?page=${page}&details=${pokemon.id}`,
       }));
       return data;
     } catch (error) {
       console.error('Error fetching pokemon details:', error);
+      return [];
     }
   };
 

@@ -17,15 +17,14 @@ const SearchSection: React.FC = () => {
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(event.target.value);
     localStorage.setItem('searchValue', event.target.value);
-  };
-
-  const handleSearch = () => {
-    if (HAS_SPACES.test(searchValue)) {
+    if (HAS_SPACES.test(event.target.value)) {
       setErrorMessage('Search field cannot contain spaces');
       setIsLoading(false);
-    } else if (HAS_CYRILLIC.test(searchValue)) {
+    } else if (HAS_CYRILLIC.test(event.target.value)) {
       setErrorMessage('Search field cannot contain Cyrillic characters');
       setIsLoading(false);
+    } else {
+      setErrorMessage('');
     }
   };
 
@@ -45,9 +44,7 @@ const SearchSection: React.FC = () => {
             placeholder="Search"
           />
         </fieldset>
-        <button onClick={handleSearch} className="search-section_button">
-          Search
-        </button>
+        <button className="search-section_button">Search</button>
         <ButtonError onClick={onClick}></ButtonError>
       </div>
       {errorMessage && <ErrorMessage message={errorMessage}></ErrorMessage>}
