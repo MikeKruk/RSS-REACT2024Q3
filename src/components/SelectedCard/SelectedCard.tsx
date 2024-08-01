@@ -8,7 +8,7 @@ const SelectedCard: React.FC<ISelectedPokemonDetails> = ({ pokemon, onClose }) =
       <button className="close-button" onClick={onClose}>
         ×
       </button>
-      <Card {...pokemon} />
+      <Card {...pokemon} selected={true} />
     </div>
   );
 };
