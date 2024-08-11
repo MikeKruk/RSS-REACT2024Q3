@@ -11,6 +11,8 @@ const Card: React.FC<ICardProps> = ({
 }: ICardProps) => {
   const handleClick = () => (onClick ? onClick() : null);
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('git');
+
     if (onSelect) {
       onSelect(event.target.checked);
     }
