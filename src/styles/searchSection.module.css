@@ -6,11 +6,11 @@
   margin: 20px 0;
 }
 
-.search-section_container {
+.container {
   width: 100%;
 }
 
-.search-section_legend{
+.legend{
   width: 25%;
 }
 
@@ -20,7 +20,7 @@
   box-sizing: border-box;
 }
 
-.search-section_button, .button-error {
+.section-button, .button-error {
   width: 50%;
 }
 
@@ -30,11 +30,11 @@
     justify-content: center;
   }
 
-  .search-section_container {
+  .container {
     width: 45%;
   }
 
-  .search-section_legend{
+  .legend{
     width: 47%;
   }
 }

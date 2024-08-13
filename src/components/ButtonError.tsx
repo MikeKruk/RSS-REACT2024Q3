@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import IProps from '../types/props';
+import styles from '@/styles/searchSection.module.css';
 
 const ButtonError: React.FC<IProps> = ({ onClick }) => {
   const [hasError, setHasError] = useState(false);
@@ -15,7 +16,7 @@ const ButtonError: React.FC<IProps> = ({ onClick }) => {
   }
 
   return (
-    <button className="button-error" onClick={handleClick}>
+    <button className={styles['button-error']} onClick={handleClick}>
       Check error
     </button>
   );

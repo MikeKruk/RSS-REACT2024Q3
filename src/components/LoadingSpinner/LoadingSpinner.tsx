@@ -1,10 +1,11 @@
+import Image from 'next/image';
 import loadingGif from '../../assets/loading-spinner.gif';
-import './loadingSpinner.css';
+import styles from '@/components/LoadingSpinner/loadingSpinner.module.css';
 
 const LoadingSpinner: React.FC = () => {
   return (
-    <div className="loading-spinner_container">
-      <img src={loadingGif} alt="Loading" className="loading-spinner_img" />
+    <div className={styles.container}>
+      <Image src={loadingGif} alt="Loading" className="loading-spinner_img" />
     </div>
   );
 };

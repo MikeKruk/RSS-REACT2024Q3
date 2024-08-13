@@ -1,7 +1,7 @@
 import CsvDownloader from 'react-csv-downloader';
 import ISelectedFlyout from '../../types/selectedFlyout';
 import UnselectAllButton from '../UnselectAllButton';
-import './selectionFlyout.css';
+import styles from '@/components/SelectionFlyout/selectionFlyout.module.css';
 
 const SelectionFlyout: React.FC<ISelectedFlyout> = ({
   selectedItems,
@@ -22,9 +22,9 @@ const SelectionFlyout: React.FC<ISelectedFlyout> = ({
   ];
 
   return (
-    <div className="selected-flyout">
+    <div className={styles.flyout}>
       <h3>Selected items: {selectedItems}</h3>
-      <div className="buttons-container">
+      <div className={styles.container}>
         <UnselectAllButton onClick={onUnselectAll} />
         <CsvDownloader
           filename={`${selectedItems}_pokemons.csv`}

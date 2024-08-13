@@ -1,8 +1,8 @@
 import IPropsErrorMessage from '../../types/ErrorMessage/propsErrorMessage';
-import './errorMessage.css';
+import styles from '@/components/ErrorMessage/errorMessage.module.css';
 
 const ErrorMessage: React.FC<IPropsErrorMessage> = ({ message }) => {
-  return <div className="error-message">{message}</div>;
+  return <div className={styles.message}>{message}</div>;
 };
 
 export default ErrorMessage;

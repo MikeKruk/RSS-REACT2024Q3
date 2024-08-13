@@ -1,11 +1,7 @@
 /// <reference types="vitest" />
-/// <reference types="vite/client" />
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react-swc';
-
-// https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [react()],
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
   test: {
     globals: true,
     environment: 'jsdom',
@@ -19,4 +15,6 @@ export default defineConfig({
       exclude: ['node_modules', 'src/types/**/*', 'src/constants/**/*'],
     },
   },
-});
+};
+
+export default nextConfig;

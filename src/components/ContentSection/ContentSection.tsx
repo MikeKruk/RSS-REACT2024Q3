@@ -13,8 +13,8 @@ import {
   usePokemonsQuery,
 } from '../../store/pokeapi/poke.api';
 import Card from '../Card/Card';
-import './contentSection.css';
 import SelectedCard from '../SelectedCard/SelectedCard';
+import styles from '@/components/ContentSection/contentSection.module.css';
 
 const ContentSection: React.FC = () => {
   const { searchValue } = useAppSelector(state => state.search);
@@ -165,7 +165,7 @@ const ContentSection: React.FC = () => {
 
   return (
     <>
-      <div className="button-container">
+      <div className={styles.button}>
         <button className="button-next" onClick={handleNextCard}>
           Next
         </button>
@@ -175,9 +175,11 @@ const ContentSection: React.FC = () => {
           </button>
         )}
       </div>
-      <div className={`content-section ${isCardSelected ? 'selected-mode' : ''}`}>
+      <div
+        className={`${styles}.content-section ${isCardSelected ? 'selected-mode' : ''}`}
+      >
         {(isLoading || isLoadingPokemons || !pokemonList) && <LoadingSpinner />}
-        <div className="cards-container" onClick={handelContentSectionClick}>
+        <div className={styles['cards-container']} onClick={handelContentSectionClick}>
           {pokemonList
             ?.filter(({ name }) => name.includes(searchValue.toLowerCase()))
             .map(pokemonItem => (
@@ -197,8 +199,8 @@ const ContentSection: React.FC = () => {
         </div>
         {isCardSelected && selectedCard && (
           <>
-            <div className="divider"></div>
-            <div className="selected-card-container">
+            <div className={styles.divider}></div>
+            <div className={styles['selected-card-container']}>
               <SelectedCard pokemon={selectedCard} onClose={handleClose} />
             </div>
           </>

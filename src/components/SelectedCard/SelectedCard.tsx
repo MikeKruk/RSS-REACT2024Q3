@@ -1,11 +1,11 @@
 import ISelectedPokemonDetails from '../../types/Pokemon/selectedPokemonDetails';
 import Card from '../Card/Card';
-import './selectedCard.css';
+import styles from '@/components/SelectedCard/selectedCard.module.css';
 
 const SelectedCard: React.FC<ISelectedPokemonDetails> = ({ pokemon, onClose }) => {
   return (
-    <div className="selected-card">
-      <button className="close-button" onClick={onClose}>
+    <div className={styles.container}>
+      <button className={styles.button} onClick={onClose}>
         ×
       </button>
       <Card {...pokemon} selected={true} />

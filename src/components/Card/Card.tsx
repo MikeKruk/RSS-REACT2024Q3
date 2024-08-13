@@ -1,5 +1,5 @@
 import ICardProps from '../../types/cardProps';
-import './card.css';
+import styles from '@/components/Card/card.module.css';
 
 const Card: React.FC<ICardProps> = ({
   name,
@@ -19,7 +19,7 @@ const Card: React.FC<ICardProps> = ({
   };
 
   return (
-    <div className="pokemon-card" onClick={handleClick}>
+    <div className={styles.card} onClick={handleClick}>
       <div className="checkbox-container">
         <input
           type="checkbox"
@@ -29,12 +29,12 @@ const Card: React.FC<ICardProps> = ({
         />
       </div>
       <h3>{name.toLocaleUpperCase()}</h3>
-      <img src={sprites.front_default} alt="Pokemon" className="pokemon-card_img" />
-      <div className="pokemon-stats">
+      <img src={sprites.front_default} alt="Pokemon" className={styles.img} />
+      <div className={styles.stats}>
         {stats.map((stat, index) => (
-          <div key={index} className="stat">
-            <span className="stat-name">{stat.stat.name}:</span>
-            <span className="stat-value">{stat.base_stat}</span>
+          <div key={index} className={styles.stat}>
+            <span className={styles.name}>{stat.stat.name}:</span>
+            <span>{stat.base_stat}</span>
           </div>
         ))}
       </div>

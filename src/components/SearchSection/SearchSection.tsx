@@ -3,9 +3,9 @@ import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 import ButtonError from '../ButtonError';
 import ErrorMessage from '../ErrorMessage/ErrorMessage';
 import { HAS_CYRILLIC, HAS_SPACES } from '../../constants/validationConstants';
-import './searchSection.css';
 import useAppSelector from '../../hooks/redux';
 import useActions from '../../hooks/actions';
+import styles from '@/styles/searchSection.module.css';
 
 const SearchSection: React.FC = () => {
   const { searchValue } = useAppSelector(state => state.search);
@@ -34,9 +34,9 @@ const SearchSection: React.FC = () => {
 
   return (
     <>
-      <div className="search-section">
-        <fieldset className="search-section_container">
-          <legend className="search-section_legend">Find your pokemon</legend>
+      <div className={styles.search_section}>
+        <fieldset className={styles.container}>
+          <legend className={styles.legend}>Find your pokemon</legend>
           <input
             type="text"
             value={searchValue}
@@ -44,7 +44,7 @@ const SearchSection: React.FC = () => {
             placeholder="Search"
           />
         </fieldset>
-        <button className="search-section_button">Search</button>
+        <button className={styles['section-button']}>Search</button>
         <ButtonError onClick={onClick}></ButtonError>
       </div>
       {errorMessage && <ErrorMessage message={errorMessage}></ErrorMessage>}
